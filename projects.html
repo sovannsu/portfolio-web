@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Projects — Sovann Su</title>
+  <meta name="description" content="Software, security, and IT projects by Sovann Su.">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to main content</a>
+
+  <header class="site-header">
+    <div class="container site-header__inner">
+      <a class="site-header__brand" href="index.html">Sovann Su</a>
+
+      <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="primary-nav">
+        Menu
+      </button>
+
+      <nav class="nav" id="primary-nav" aria-label="Primary">
+        <ul class="nav__list">
+          <li><a class="nav__link" href="index.html">About</a></li>
+          <li><a class="nav__link nav__link--active" href="projects.html" aria-current="page">Projects</a></li>
+          <li><a class="nav__link" href="skills.html">Skills &amp; Certifications</a></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <section class="page-header">
+    <div class="container">
+      <h1 class="page-header__title">Projects</h1>
+      <p class="page-header__subtitle">
+        Coursework, personal builds, and security work. Each card links out to a repository,
+        write-up, or live demo.
+      </p>
+    </div>
+  </section>
+
+  <main class="main" id="main">
+    <div class="container">
+
+      <section class="section" id="project-list">
+        <h2 class="section__title"><span>Selected work</span></h2>
+
+        <!-- ==================================================================
+             PROJECT GRID
+             Add each project as one article element inside this grid. A ready
+             to copy card is in project-card-template.html (open it in a
+             browser to see the rendered result).
+             ================================================================== -->
+        <div class="grid grid--auto" id="project-grid">
+
+          <!-- Remove this placeholder card once your first real project is added. -->
+          <article class="card card--placeholder">
+            <h3 class="card__title">First project coming soon</h3>
+            <p class="card__meta">Placeholder</p>
+            <div class="card__body">
+              <p>
+                Copy the card markup from <code>project-card-template.html</code> into the
+                <code>project-grid</code> container in <code>projects.html</code> to add a
+                real entry. Each card holds a title, context line, short description,
+                technology tags, and up to two links.
+              </p>
+            </div>
+            <div class="card__footer">
+              <a class="btn btn--small btn--secondary" href="https://github.com/sovannsu" target="_blank" rel="noopener">GitHub profile</a>
+            </div>
+          </article>
+
+        </div>
+      </section>
+
+      <section class="section" id="project-notes">
+        <div class="empty-state">
+          <h3>More on the way</h3>
+          <p>
+            Additional coursework and security projects will be published here as they are
+            documented. In the meantime, my repositories are on
+            <a href="https://github.com/sovannsu" target="_blank" rel="noopener">GitHub</a>.
+          </p>
+        </div>
+      </section>
+
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container site-footer__inner">
+      <p>&copy; 2026 Sovann Su</p>
+      <ul class="site-footer__links">
+        <li><a href="mailto:sovannsu@gmail.com">sovannsu@gmail.com</a></li>
+        <li><a href="https://www.linkedin.com/in/sovann-su" target="_blank" rel="noopener">LinkedIn</a></li>
+        <li><a href="https://github.com/sovannsu" target="_blank" rel="noopener">GitHub</a></li>
+      </ul>
+    </div>
+  </footer>
+
+  <script src="js/main.js"></script>
+</body>
+</html>
