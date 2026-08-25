@@ -17,6 +17,7 @@
    12. Responsive breakpoints
    13. Accessibility & motion preferences
    14. Case study (long-form project write-ups)
+   15. Touch and small-screen refinements
    ========================================================================== */
 
 /* 1. Design tokens ------------------------------------------------------- */
@@ -147,6 +148,14 @@ code {
   background-color: var(--color-bg-alt);
   padding: 0.1em 0.35em;
   border-radius: var(--radius-sm);
+}
+
+/* The browser's own [hidden] rule is display:none, but any author rule that
+   sets display beats it — .btn { display: inline-flex } was overriding it and
+   showing the hidden resume button. This restores [hidden] as the last word
+   for every element, whatever else styles it. */
+[hidden] {
+  display: none !important;
 }
 
 /* 3. Layout helpers ------------------------------------------------------ */
@@ -758,6 +767,24 @@ code {
     padding: var(--space-3);
   }
 
+  .tabs__panel {
+    padding: var(--space-5) var(--space-4);
+  }
+
+  .hero {
+    padding: var(--space-7) 0;
+  }
+}
+
+/* Certification tabs stack until 768px.
+
+   A horizontal row of five tabs needs about 765px to fit. Between 701px and
+   764px — small tablets, and phones held sideways — the fifth tab wrapped
+   onto its own line, which read as a broken grid rather than a second row.
+   Stacked full-width tabs also give a much larger touch target, so the
+   stacked form is the right one for that whole band. */
+
+@media (max-width: 767px) {
   .tabs__list {
     flex-direction: column;
     border-bottom: 0;
@@ -775,14 +802,6 @@ code {
 
   .tabs__tab[aria-selected="true"] {
     border-color: var(--color-accent);
-  }
-
-  .tabs__panel {
-    padding: var(--space-5) var(--space-4);
-  }
-
-  .hero {
-    padding: var(--space-7) 0;
   }
 }
 
@@ -1122,4 +1141,150 @@ code {
   .stat {
     padding: var(--space-3) var(--space-4);
   }
+}
+
+/* 15. Touch and small-screen refinements ---------------------------------
+   Fixes found by measuring the real pages at phone and tablet widths rather
+   than by guessing at breakpoints. Three separate problems:
+
+   a) Touch targets. Footer links were 17px tall, the back link 25px, small
+      buttons 39px. The usual minimum is 44px. These are raised only for
+      coarse pointers, so a mouse keeps the tighter desktop spacing.
+   b) Landscape phones. The hero was 467px tall on a 390px-tall viewport, so
+      the call-to-action buttons sat below the fold and the sticky header ate
+      a sixth of what was left.
+   c) Ragged wrapping in the case study meta strip between 420px and 700px.
+   ---------------------------------------------------------------------- */
+
+/* (a) Touch targets ------------------------------------------------------ */
+
+@media (pointer: coarse) {
+  .nav__link,
+  .tabs__tab,
+  .btn,
+  .nav-toggle {
+    min-height: 44px;
+  }
+
+  /* Only alignment here — never `display`. The nav toggle's visibility is
+     decided by width alone (it is display:none until 700px), and setting
+     display in a pointer query would show it on wide touch screens too. */
+  .btn {
+    justify-content: center;
+  }
+
+  .nav__link {
+    display: flex;
+    align-items: center;
+  }
+
+  /* Inline links that sit in a row need vertical room around them, not
+     bigger text. inline-flex plus a min-height grows the hit area while
+     leaving the visible text exactly where it was. */
+  .site-header__brand,
+  .site-footer__links a,
+  .back-link,
+  .card__title a {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+  }
+
+  .site-footer__links {
+    gap: 0 var(--space-5);
+  }
+
+  /* Stop the grey flash on tap; :focus-visible already shows the target. */
+  a,
+  button {
+    -webkit-tap-highlight-color: transparent;
+  }
+}
+
+/* (b) Short viewports (phones held sideways) ----------------------------- */
+
+@media (max-height: 500px) and (orientation: landscape) {
+  :root {
+    --fs-3xl: 1.75rem;
+    --fs-2xl: 1.375rem;
+  }
+
+  .site-header {
+    position: static;
+  }
+
+  .hero {
+    padding: var(--space-4) 0;
+  }
+
+  .hero__subtitle {
+    font-size: var(--fs-base);
+    margin-bottom: var(--space-4);
+  }
+
+  .page-header {
+    padding: var(--space-5) 0 var(--space-4);
+  }
+
+  .main {
+    padding: var(--space-5) 0 var(--space-6);
+  }
+
+  .section {
+    margin-bottom: var(--space-6);
+  }
+}
+
+/* Very short viewports — smaller phones held sideways. Trims the header bar
+   and the last of the hero padding so the call-to-action buttons clear the
+   fold on a 360px-tall screen too. */
+
+@media (max-height: 380px) and (orientation: landscape) {
+  .site-header__inner {
+    min-height: 52px;
+  }
+
+  .hero {
+    padding: var(--space-3) 0;
+  }
+
+  .hero__subtitle {
+    margin-bottom: var(--space-3);
+  }
+}
+
+/* (c) Case study meta strip ---------------------------------------------- */
+
+@media (max-width: 700px) {
+  .case-study__meta {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--space-3);
+  }
+}
+
+@media (max-width: 430px) {
+  .case-study__meta {
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--space-2);
+  }
+}
+
+/* Narrow phones: reclaim side padding for content ------------------------ */
+
+@media (max-width: 380px) {
+  .container {
+    padding: 0 var(--space-4);
+  }
+
+  .card,
+  .empty-state,
+  .tabs__panel {
+    padding: var(--space-4);
+  }
+}
+
+/* Momentum scrolling for the sideways-scrolling table on iOS. */
+.table-wrap {
+  -webkit-overflow-scrolling: touch;
 }
