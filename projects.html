@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Projects — Sovann Su</title>
   <meta name="description" content="Software, security, and IT projects by Sovann Su.">
+  <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
   <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
@@ -52,20 +53,27 @@
              ================================================================== -->
         <div class="grid grid--auto" id="project-grid">
 
-          <!-- Remove this placeholder card once your first real project is added. -->
-          <article class="card card--placeholder">
-            <h3 class="card__title">First project coming soon</h3>
-            <p class="card__meta">Placeholder</p>
+          <article class="card">
+            <h3 class="card__title">
+              <a href="case-study-geo.html">AI search citation instrument</a>
+            </h3>
+            <p class="card__meta">Faculty-supervised IS research &middot; 2026</p>
             <div class="card__body">
               <p>
-                Copy the card markup from <code>project-card-template.html</code> into the
-                <code>project-grid</code> container in <code>projects.html</code> to add a
-                real entry. Each card holds a title, context line, short description,
-                technology tags, and up to two links.
+                A browser-driven capture pipeline that records which pages Perplexity, ChatGPT,
+                and Gemini retrieve &mdash; not just the ones they cite. Reverse-engineered three
+                undocumented response formats across roughly 300 runs, and found the platforms
+                define &ldquo;retrieved&rdquo; incompatibly enough to redesign the study.
               </p>
+              <ul class="tag-list">
+                <li><span class="tag">Python</span></li>
+                <li><span class="tag">Chrome DevTools Protocol</span></li>
+                <li><span class="tag">Selenium</span></li>
+                <li><span class="tag tag--accent">Research engineering</span></li>
+              </ul>
             </div>
             <div class="card__footer">
-              <a class="btn btn--small btn--secondary" href="https://github.com/sovannsu" target="_blank" rel="noopener">GitHub profile</a>
+              <a class="btn btn--small" href="case-study-geo.html">Read the case study</a>
             </div>
           </article>
 
@@ -76,7 +84,7 @@
         <div class="empty-state">
           <h3>More on the way</h3>
           <p>
-            Additional coursework and security projects will be published here as they are
+            Additional coursework and security projects will be written up here as they are
             documented. In the meantime, my repositories are on
             <a href="https://github.com/sovannsu" target="_blank" rel="noopener">GitHub</a>.
           </p>
@@ -91,6 +99,7 @@
       <p>&copy; 2026 Sovann Su</p>
       <ul class="site-footer__links">
         <li><a href="mailto:sovannsu@gmail.com">sovannsu@gmail.com</a></li>
+        <li hidden data-resume-link-item><a href="assets/resume.pdf" data-resume-link target="_blank" rel="noopener">Resume (PDF)</a></li>
         <li><a href="https://www.linkedin.com/in/sovann-su" target="_blank" rel="noopener">LinkedIn</a></li>
         <li><a href="https://github.com/sovannsu" target="_blank" rel="noopener">GitHub</a></li>
       </ul>

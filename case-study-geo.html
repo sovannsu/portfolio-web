@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Reverse-engineering AI search citations — Sovann Su</title>
+  <meta name="description" content="Case study: building a browser-based data-collection instrument to capture which pages Perplexity, ChatGPT, and Gemini retrieve and which they cite.">
+  <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to main content</a>
+
+  <header class="site-header">
+    <div class="container site-header__inner">
+      <a class="site-header__brand" href="index.html">Sovann Su</a>
+
+      <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="primary-nav">
+        Menu
+      </button>
+
+      <nav class="nav" id="primary-nav" aria-label="Primary">
+        <ul class="nav__list">
+          <li><a class="nav__link" href="index.html">About</a></li>
+          <li><a class="nav__link nav__link--active" href="projects.html">Projects</a></li>
+          <li><a class="nav__link" href="skills.html">Skills &amp; Certifications</a></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <main class="main" id="main">
+    <div class="container container--narrow">
+      <a class="back-link" href="projects.html">&larr; All projects</a>
+
+      <article class="case-study">
+
+        <p class="case-study__eyebrow">Research engineering &middot; 2026</p>
+        <h1>Reverse-engineering how three AI search engines pick their citations</h1>
+        <p class="case-study__deck">
+          I built the data-collection instrument for an information-systems study on AI search.
+          It answered the question it was built for &mdash; and then told us the study's central
+          comparison didn't mean what we thought it meant.
+        </p>
+
+        <ul class="case-study__meta">
+          <li><b>Role</b> Sole developer</li>
+          <li><b>Context</b> Faculty-supervised IS research</li>
+          <li><b>Duration</b> ~5 weeks</li>
+          <li><b>Stack</b> Python &middot; CDP &middot; Selenium</li>
+        </ul>
+
+        <h2>The problem</h2>
+        <p>
+          When Perplexity, ChatGPT, or Gemini answer a question, they retrieve a set of candidate
+          web pages and then cite a few of them. Our study asked what makes one page get cited over
+          another &mdash; which means the interesting data isn't the citations. It's the
+          <strong>pages that were retrieved and then passed over</strong>.
+        </p>
+        <p>
+          Every platform's public API hides exactly that. The APIs return the cited sources only,
+          and their search backends aren't even the ones the real products use. The uncited
+          candidates exist only in the web UI's own network traffic.
+        </p>
+        <p>
+          So the instrument had to be a browser: drive each product's live interface, intercept the
+          response stream, and reconstruct both the retrieved pool and the cited subset from formats
+          none of the three vendors document.
+        </p>
+
+        <ul class="stat-row">
+          <li class="stat">
+            <span class="stat__value">3</span>
+            <span class="stat__label">Platforms parsed</span>
+          </li>
+          <li class="stat">
+            <span class="stat__value">~300</span>
+            <span class="stat__label">Usable runs</span>
+          </li>
+          <li class="stat">
+            <span class="stat__value">0</span>
+            <span class="stat__label">Documented formats</span>
+          </li>
+          <li class="stat">
+            <span class="stat__value">9</span>
+            <span class="stat__label">Wrong conclusions caught</span>
+          </li>
+        </ul>
+
+        <h2>What I built</h2>
+        <p>
+          A two-phase <strong>capture &rarr; extract</strong> pipeline with a per-platform adapter
+          for each engine. Capture drives the live UI and records the raw response stream, the
+          rendered HTML, and a screenshot into a per-run bundle. Extract parses those bundles
+          offline, so every number in the study can be re-derived without re-querying a platform
+          &mdash; and so a parser bug is a re-run of the parser, not a re-run of the collection.
+        </p>
+        <p>
+          Two design rules did most of the work. <strong>Fail loudly:</strong> a blocked or empty
+          run is recorded as a failure with a reason, never as a silent zero &mdash; a scraper that
+          quietly returns nothing is worse than one that crashes, because the empty result flows
+          into the analysis looking like data. <strong>Keep the raw bytes:</strong> every claim
+          traces back to a saved artifact.
+        </p>
+
+        <h2>Three problems worth describing</h2>
+        <ul class="problem-list">
+
+          <li class="problem">
+            <span class="problem__tag">01 &middot; The capture race that wasn't</span>
+            <h3>Rich answers never finish</h3>
+            <p>
+              Captures were missing roughly half the time. The working theory was a buffer eviction
+              race. It wasn't: the code read each response body after the stream reported
+              completion, and answers containing images or widgets <em>keep the connection open
+              indefinitely</em> &mdash; the completion event never fires. Any capture gated on it
+              hangs or misses. The fix was to stream bytes as they arrive and settle on
+              <strong>idle</strong> rather than on completion. A 526&nbsp;KB response that never
+              closed its stream then captured cleanly.
+            </p>
+          </li>
+
+          <li class="problem">
+            <span class="problem__tag">02 &middot; An undocumented nested format</span>
+            <h3>Finding the citation link in Gemini</h3>
+            <p>
+              Gemini returns Google's nested-array encoding: an XSSI guard, length-prefixed frames,
+              and an inner payload that is a double-escaped JSON string. Nothing is named &mdash; a
+              source is a bare array, and whether it was cited is encoded <em>positionally</em>. I
+              dumped raw subtrees across grounded and ungrounded runs until the rule fell out: a
+              source is cited when its fourth slot holds a sentence carrying character-span offsets
+              into the answer. The official API docs describe a redirect-wrapper structure for this;
+              the web product has zero of them. Reading the docs would have produced a parser that
+              found nothing.
+            </p>
+          </li>
+
+          <li class="problem">
+            <span class="problem__tag">03 &middot; The vendor changed the format mid-study</span>
+            <h3>A migration disguised as a block</h3>
+            <p>
+              Partway through a collection sweep, every new capture started failing identically. It
+              looked like rate limiting or bot detection. It was neither &mdash; the platform had
+              A/B-rolled a new response schema, and my validator reported the unfamiliar shape as a
+              block. The repair had to be conservative: run the old parse path first and fall back
+              to the new one only when it yields nothing, so that already-analyzed captures stay
+              byte-identical rather than silently changing published numbers. It recovered nine runs
+              and cost zero. The lasting lesson is a monitoring one &mdash;
+              <strong>"we were blocked" and "the format moved" must not produce the same
+              error.</strong>
+            </p>
+          </li>
+
+        </ul>
+
+        <h2>The finding that changed the study</h2>
+        <p>
+          With all three adapters working, the headline number was supposed to be a simple
+          comparison of how selectively each engine cites. Here is what came out:
+        </p>
+
+        <div class="table-wrap">
+          <table class="data-table">
+            <caption>Citation behaviour across ~300 runs</caption>
+            <thead>
+              <tr>
+                <th scope="col">Measure</th>
+                <th scope="col" class="num">Perplexity</th>
+                <th scope="col" class="num">ChatGPT</th>
+                <th scope="col" class="num">Gemini</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <th scope="row">Runs citing at least one source</th>
+                <td class="num">84%</td>
+                <td class="num">100%</td>
+                <td class="num">100%</td>
+              </tr>
+              <tr>
+                <th scope="row">Retrieved sources actually cited</th>
+                <td class="num">38%</td>
+                <td class="num">79%</td>
+                <td class="num">100%</td>
+              </tr>
+              <tr>
+                <th scope="row">What its &ldquo;pool&rdquo; contains</th>
+                <td>a real retrieval set</td>
+                <td>everything referenced</td>
+                <td>only what it cites</td>
+              </tr>
+              <tr>
+                <th scope="row">Retrieved-but-uncited pages</th>
+                <td>genuine</td>
+                <td>demoted, not unused</td>
+                <td>none exist</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="key-finding">
+          <p class="key-finding__lead">
+            The three engines look almost identical at the level of &ldquo;did this answer cite
+            anything,&rdquo; and wildly different one level down. That spread isn't mostly behaviour
+            &mdash; it's three incompatible definitions of what counts as retrieved.
+          </p>
+          <p>
+            Our core research question compares pages <em>within</em> a retrieved pool. Only one of
+            the three platforms exposes such a pool. Gemini publishes only what it cites, so there
+            is nothing to compare against; ChatGPT's &ldquo;uncited&rdquo; sources turn out to be
+            demoted to secondary evidence rather than passed over. The cross-platform comparison the
+            study was designed around was measuring a different object on each platform.
+          </p>
+        </div>
+
+        <p>
+          That is a negative result about our own instrument, and it was the most valuable thing the
+          pilot produced. It redirected the project toward a controlled design &mdash; supplying the
+          candidate documents ourselves, so the pool is identical by construction &mdash; and it
+          arrived before months of analysis had been built on the assumption.
+        </p>
+
+        <h2>How I worked</h2>
+        <p>
+          The project log records nine claims I made and later had to correct &mdash; including one
+          I had committed to the repository and reported to my supervisor. Two were his catches, not
+          mine.
+        </p>
+        <p>
+          They share a cause: I generalized a structure from a single captured example, or trusted a
+          vendor's documentation, instead of reading the actual bytes. Every correction came from
+          dumping the real artifact. That hardened into the rule the rest of the work ran on &mdash;
+          <strong>inspect the failing artifact before writing a line of code against it</strong>
+          &mdash; and into a habit of writing down the wrong turns, because on an instrument nobody
+          else has built, the record of what <em>isn't</em> true is most of the documentation.
+        </p>
+
+        <p class="case-study__stack">
+          <b>Built with</b> Python &middot; Chrome DevTools Protocol &middot; Selenium /
+          undetected-chromedriver &middot; pandas<br>
+          <b>Techniques</b> live network-stream interception &middot; offline replay-based parsing
+          &middot; reverse-engineered SSE and nested-array formats &middot; isolated sessions for
+          confound control &middot; schema-migration-tolerant parsing
+        </p>
+
+      </article>
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container site-footer__inner">
+      <p>&copy; 2026 Sovann Su</p>
+      <ul class="site-footer__links">
+        <li><a href="mailto:sovannsu@gmail.com">sovannsu@gmail.com</a></li>
+        <li hidden data-resume-link-item><a href="assets/resume.pdf" data-resume-link target="_blank" rel="noopener">Resume (PDF)</a></li>
+        <li><a href="https://www.linkedin.com/in/sovann-su" target="_blank" rel="noopener">LinkedIn</a></li>
+        <li><a href="https://github.com/sovannsu" target="_blank" rel="noopener">GitHub</a></li>
+      </ul>
+    </div>
+  </footer>
+
+  <script src="js/main.js"></script>
+</body>
+</html>

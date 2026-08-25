@@ -102,8 +102,57 @@
     selectTab(initial, false);
   }
 
+  /* ---------------------------------------------------------------
+     Resume download link
+
+     The hero button and the footer link both point at assets/resume.pdf
+     and start hidden. We ask the server whether the file is actually
+     there and reveal them only if it is, so the site never offers a
+     download that 404s. Drop the PDF in and the links appear; remove it
+     and they hide again. No HTML edits needed either way.
+
+     The check needs a real server, so it is skipped on file:// URLs.
+     --------------------------------------------------------------- */
+  function initResumeLink() {
+    var links = document.querySelectorAll("[data-resume-link]");
+
+    if (links.length === 0 || window.location.protocol === "file:") {
+      return;
+    }
+
+    var href = links[0].getAttribute("href");
+
+    function reveal() {
+      Array.prototype.forEach.call(links, function (link) {
+        link.hidden = false;
+
+        /* The footer link is wrapped in an <li> that also starts hidden. */
+        var item = link.closest ? link.closest("[data-resume-link-item]") : null;
+        if (item) {
+          item.hidden = false;
+        }
+      });
+    }
+
+    if (typeof window.fetch !== "function") {
+      return;
+    }
+
+    window
+      .fetch(href, { method: "HEAD" })
+      .then(function (response) {
+        if (response.ok) {
+          reveal();
+        }
+      })
+      .catch(function () {
+        /* Network error or no file: leave the links hidden. */
+      });
+  }
+
   document.addEventListener("DOMContentLoaded", function () {
     initNav();
     initTabs();
+    initResumeLink();
   });
 })();

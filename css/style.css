@@ -16,6 +16,7 @@
    11. Footer
    12. Responsive breakpoints
    13. Accessibility & motion preferences
+   14. Case study (long-form project write-ups)
    ========================================================================== */
 
 /* 1. Design tokens ------------------------------------------------------- */
@@ -849,5 +850,273 @@ code {
 
   .tabs__panel[hidden] {
     display: block !important;
+  }
+}
+
+/* 14. Case study --------------------------------------------------------
+   Long-form project write-ups (case-study-geo.html). These styles were
+   ported from a standalone case study document that shipped its own
+   <style> block and its own palette. The palette is deliberately NOT kept:
+   every value below resolves to the site tokens in section 1, so the page
+   reads as part of this site rather than a guest document. Restyle from
+   :root, not from here.
+   ---------------------------------------------------------------------- */
+
+.container--narrow {
+  max-width: 780px;
+}
+
+.case-study {
+  --measure: 68ch;
+}
+
+.case-study p,
+.case-study ul,
+.case-study ol {
+  max-width: var(--measure);
+}
+
+.case-study h2 {
+  margin-top: var(--space-7);
+  margin-bottom: var(--space-3);
+}
+
+.case-study h3 {
+  font-size: var(--fs-base);
+  margin-bottom: var(--space-2);
+}
+
+.case-study em {
+  color: var(--color-text-muted);
+}
+
+/* Header block ---------------------------------------------------------- */
+
+.case-study__eyebrow {
+  font-family: var(--font-mono);
+  font-size: var(--fs-xs);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--color-accent);
+  margin-bottom: var(--space-4);
+}
+
+.case-study__deck {
+  font-size: var(--fs-lg);
+  color: var(--color-text-muted);
+  margin-bottom: var(--space-5);
+}
+
+.case-study__meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2) var(--space-6);
+  list-style: none;
+  margin: 0 0 var(--space-6);
+  padding: 0 0 var(--space-5);
+  border-bottom: 1px solid var(--color-border);
+  font-family: var(--font-mono);
+  font-size: var(--fs-xs);
+  color: var(--color-text-muted);
+}
+
+.case-study__meta li {
+  margin: 0;
+}
+
+.case-study__meta b {
+  color: var(--color-text);
+  font-weight: 600;
+}
+
+/* Stat row -------------------------------------------------------------- */
+
+.stat-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 1px;
+  background-color: var(--color-border);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  overflow: hidden;
+  list-style: none;
+  margin: 0 0 var(--space-6);
+  padding: 0;
+}
+
+.stat {
+  background-color: var(--color-bg-alt);
+  padding: var(--space-4) var(--space-5);
+  margin: 0;
+}
+
+.stat__value {
+  display: block;
+  font-size: var(--fs-2xl);
+  font-weight: 650;
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+  font-variant-numeric: tabular-nums;
+}
+
+.stat__label {
+  display: block;
+  margin-top: var(--space-1);
+  font-family: var(--font-mono);
+  font-size: 0.6875rem;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  color: var(--color-text-muted);
+}
+
+/* Key finding ----------------------------------------------------------- */
+
+.key-finding {
+  border-left: 3px solid var(--color-accent);
+  padding: var(--space-1) 0 var(--space-1) var(--space-5);
+  margin: 0 0 var(--space-6);
+  max-width: var(--measure);
+}
+
+.key-finding p:last-child {
+  margin-bottom: 0;
+}
+
+.key-finding__lead {
+  font-size: var(--fs-lg);
+  font-weight: 550;
+  line-height: 1.45;
+}
+
+/* Data table ------------------------------------------------------------ */
+
+.table-wrap {
+  overflow-x: auto;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  margin: 0 0 var(--space-6);
+}
+
+.data-table {
+  border-collapse: collapse;
+  width: 100%;
+  min-width: 520px;
+  font-size: var(--fs-sm);
+}
+
+.data-table caption {
+  caption-side: top;
+  text-align: left;
+  padding: var(--space-3) var(--space-4) 0;
+  font-family: var(--font-mono);
+  font-size: 0.6875rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--color-text-muted);
+}
+
+.data-table th,
+.data-table td {
+  text-align: left;
+  padding: var(--space-3) var(--space-4);
+  border-bottom: 1px solid var(--color-border);
+  vertical-align: top;
+}
+
+.data-table thead th {
+  background-color: var(--color-bg-alt);
+  font-family: var(--font-mono);
+  font-size: 0.625rem;
+  font-weight: 500;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--color-text-muted);
+  white-space: nowrap;
+}
+
+.data-table tbody tr:last-child td {
+  border-bottom: 0;
+}
+
+.data-table tbody th[scope="row"] {
+  font-weight: 550;
+}
+
+.data-table .num {
+  font-variant-numeric: tabular-nums;
+}
+
+/* Problem list ---------------------------------------------------------- */
+
+.problem-list {
+  list-style: none;
+  margin: 0 0 var(--space-6);
+  padding: 0;
+}
+
+.problem {
+  max-width: var(--measure);
+  margin: 0;
+  padding: var(--space-5) 0;
+  border-top: 1px solid var(--color-border);
+}
+
+.problem:last-child {
+  border-bottom: 1px solid var(--color-border);
+}
+
+.problem__tag {
+  display: block;
+  margin-bottom: var(--space-2);
+  font-family: var(--font-mono);
+  font-size: 0.6875rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--color-accent);
+}
+
+.problem h3 {
+  margin-bottom: var(--space-2);
+}
+
+.problem p {
+  margin-bottom: 0;
+  font-size: var(--fs-sm);
+  color: var(--color-text-muted);
+}
+
+/* Stack footer ---------------------------------------------------------- */
+
+.case-study__stack {
+  margin-top: var(--space-7);
+  padding-top: var(--space-5);
+  border-top: 1px solid var(--color-border);
+  font-family: var(--font-mono);
+  font-size: var(--fs-xs);
+  line-height: 1.9;
+  color: var(--color-text-muted);
+  max-width: none;
+}
+
+.case-study__stack b {
+  color: var(--color-text);
+  font-weight: 600;
+}
+
+/* Back link ------------------------------------------------------------- */
+
+.back-link {
+  display: inline-block;
+  margin-bottom: var(--space-5);
+  font-size: var(--fs-sm);
+}
+
+@media (max-width: 700px) {
+  .case-study__meta {
+    gap: var(--space-1) var(--space-5);
+  }
+
+  .stat {
+    padding: var(--space-3) var(--space-4);
   }
 }
